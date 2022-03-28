@@ -1,0 +1,9 @@
+###
+
+POST  http://127.0.0.1:8080/chat/d73f0d3c-6a8b-4a22-b8a1-399d4fba9a2b/add
+Content-Type: application/json
+
+{
+  "username": "Sprow",
+  "text": "Hello!"
+}
