@@ -30,7 +30,3 @@ func (cm *ChatsManager) GetChat(id uuid.UUID) (*Chat, error) {
 	}
 	return nil, fmt.Errorf("chat not found")
 }
-
-//func (cm *ChatsManager) AddMessage(id uuid.UUID, msg Message) {
-//	cm.listOfChats[id].ListOfMessages = append(cm.listOfChats[id].ListOfMessages, msg)
-//}
