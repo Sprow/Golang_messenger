@@ -13,7 +13,8 @@ import (
 
 type Handler struct {
 	chat messenger.Chat
-	msg  messenger.Messages
+	//msg  messenger.Messages
+	msg messenger.Messages
 }
 
 func NewHandler(chat messenger.Chat, msg messenger.Messages) *Handler {

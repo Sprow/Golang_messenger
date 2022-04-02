@@ -28,7 +28,6 @@ func Initialize(cfg Config) (PostgreSqlDB, error) {
 	db := PostgreSqlDB{}
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		cfg.Username, cfg.Password, HOST, PORT, cfg.DBName)
-	log.Println("connect >>> ", connStr)
 	conn, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return db, err

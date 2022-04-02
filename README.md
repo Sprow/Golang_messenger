@@ -1,4 +1,4 @@
-change variable CHOOSE_DATABASE=(MONGO_DB or POSTGRE_SQL) to switch for another DB
+change variable (.env file) CHOOSE_DATABASE=(MONGO_DB or POSTGRE_SQL) to switch for another DB
 
 
 

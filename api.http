@@ -1,9 +1,9 @@
 ###                                 change chat id
 
-POST  http://127.0.0.1:8080/chat/6248170df22096b0e78a3aea/add
+POST  http://127.0.0.1:8080/chat/624845f4b9c7ddbf90e01e31/add
 Content-Type: application/json
 
 {
-  "username": "Tommy",
+  "username": "Tommy2",
   "text": "Hello!"
 }

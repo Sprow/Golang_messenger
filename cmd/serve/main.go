@@ -71,6 +71,8 @@ func main() {
 		panic("cant connect database")
 	}
 
+	message = messenger.NewMessagesCache(message) // add cache
+
 	h := handler.NewHandler(chat, message)
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
