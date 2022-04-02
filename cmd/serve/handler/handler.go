@@ -12,16 +12,14 @@ import (
 )
 
 type Handler struct {
-	//chatsManager *messenger.ChatsManager
-	chatMongoDB *messenger.ChatMongoDB
-	msgMongoDB  *messenger.MessageMongoDB
+	chat messenger.Chat
+	msg  messenger.Messages
 }
 
-func NewHandler(chatMongoDb *messenger.ChatMongoDB, msgMongoDB *messenger.MessageMongoDB) *Handler {
+func NewHandler(chat messenger.Chat, msg messenger.Messages) *Handler {
 	return &Handler{
-		//chatsManager: cm,
-		chatMongoDB: chatMongoDb,
-		msgMongoDB:  msgMongoDB,
+		chat: chat,
+		msg:  msg,
 	}
 }
 
@@ -32,29 +30,22 @@ func (h *Handler) Register(r *chi.Mux) {
 }
 
 func (h *Handler) addChatHandler(w http.ResponseWriter, r *http.Request) {
-	//d := json.NewDecoder(r.Body)
-	//var chatName string
-	//err := d.Decode(&chatName)
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
-	id, err := h.chatMongoDB.AddChat(ctx)
+	newChatID := primitive.NewObjectID().Hex()
+
+	id, err := h.chat.AddChat(ctx, newChatID)
 	if err != nil {
 		log.Println(err)
 	}
-	http.Redirect(w, r, "http://192.168.1.33:8080/chat/"+id.Hex(), http.StatusFound)
+	http.Redirect(w, r, "http://192.168.1.33:8080/chat/"+id, http.StatusFound)
 }
-
-//func (h *Handler) addChatHandler(w http.ResponseWriter, r *http.Request) {
-//	id := h.chatsManager.AddChat()
-//	http.Redirect(w, r, "http://192.168.1.33:8080/chat/"+id.String(), http.StatusFound)
-//}
 
 func (h *Handler) getChatHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	chatID, err := primitive.ObjectIDFromHex(id) // convert string to Primitive.ObjectID
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
-	chat, err := h.msgMongoDB.GetAllChatMessages(ctx, chatID)
+	chat, err := h.msg.GetAllChatMessages(ctx, id)
 	if err != nil {
 		log.Printf("Chat not found %s", id)
 		http.Error(w, "Chat not found "+id, http.StatusNotFound)
@@ -67,30 +58,11 @@ func (h *Handler) getChatHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//func (h *Handler) getChatHandler(w http.ResponseWriter, r *http.Request) {
-//	id := chi.URLParam(r, "id")
-//	chat, err := h.chatsManager.GetChat(uuid.MustParse(id))
-//	if err != nil {
-//		log.Printf("Chat not found %s", id)
-//		http.Error(w, "Chat not found "+id, http.StatusNotFound)
-//		return
-//	}
-//	encoder := json.NewEncoder(w)
-//	err = encoder.Encode(chat)
-//	if err != nil {
-//		log.Println(err)
-//	}
-//}
-
 func (h *Handler) addMessageHandler(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")                  //string
-	chatID, err := primitive.ObjectIDFromHex(id) // convert string to Primitive.ObjectID
-	if err != nil {
-		panic(err)
-	}
+	chatID := chi.URLParam(r, "id") //string
 	d := json.NewDecoder(r.Body)
-	var msg messenger.MessageMongo
-	err = d.Decode(&msg)
+	var msg messenger.Message
+	err := d.Decode(&msg)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Bad request", http.StatusBadRequest)
@@ -99,37 +71,12 @@ func (h *Handler) addMessageHandler(w http.ResponseWriter, r *http.Request) {
 
 	msg.ChatID = chatID
 	msg.CreatedAt = time.Now()
+	msg.ID = primitive.NewObjectID().Hex()
 
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
-	err = h.msgMongoDB.AddMessage(ctx, msg)
-
-	//chat, err := h.chatsManager.GetChat(uuid.MustParse(id))
-	//if err != nil {
-	//	log.Printf("Chat not found %s", id)
-	//	http.Error(w, "Chat not found "+id, http.StatusNotFound)
-	//	return
-	//}
-	//msg.CreatedAt = time.Now()
-	//chat.AddMessage(msg)
+	err = h.msg.AddMessage(ctx, msg)
+	if err != nil {
+		log.Println(err)
+	}
 }
-
-//func (h *Handler) addMessageHandler(w http.ResponseWriter, r *http.Request) {
-//	id := chi.URLParam(r, "id")
-//	d := json.NewDecoder(r.Body)
-//	var msg messenger.Message
-//	err := d.Decode(&msg)
-//	if err != nil {
-//		log.Println(err)
-//		http.Error(w, "Bad request", http.StatusBadRequest)
-//		return
-//	}
-//	chat, err := h.chatsManager.GetChat(uuid.MustParse(id))
-//	if err != nil {
-//		log.Printf("Chat not found %s", id)
-//		http.Error(w, "Chat not found "+id, http.StatusNotFound)
-//		return
-//	}
-//	msg.CreatedAt = time.Now()
-//	chat.AddMessage(msg)
-//}
