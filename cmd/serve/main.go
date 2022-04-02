@@ -60,7 +60,7 @@ func main() {
 	}
 	var chat messenger.Chat
 	var message messenger.Messages
-
+	
 	if os.Getenv("CHOOSE_DATABASE") == "MONGO_DB" {
 		chat, message = mongoDB()
 		log.Println("connect to MongoDB")
